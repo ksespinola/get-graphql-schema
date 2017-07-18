@@ -15,12 +15,19 @@ const usage = `  Usage: get-graphql-schema ENDPOINT_URL > schema.graphql
   (Outputs schema in IDL syntax by default)
 
   Options:
-    --json, -j      Output in JSON format (based on introspection query)
-    --version, -v   Print version of get-graphql-schema
+    --json, -j          Output in JSON format (based on introspection query)
+    --version, -v       Print version of get-graphql-schema
+    --auth_header, - h  Auth Header [default: Authorization]
+    --auth_token, -t    Authorization token [default: '']
 `
 
 async function main() {
   const argv = minimist(process.argv.slice(2))
+
+  const auth_header_arg = argv['auth_header'] || argv['a']
+  const auth_token_arg = argv['auth_token'] || argv['t']
+  const auth_header = auth_header_arg || 'Authorization'
+  const auth_token = auth_token_arg || ''
 
   if (argv._.length < 1) {
     console.log(usage)
@@ -38,6 +45,7 @@ async function main() {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      [auth_header]: auth_token
     },
     body: JSON.stringify({ query: introspectionQuery }),
   })
